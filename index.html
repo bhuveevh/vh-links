@@ -17,7 +17,7 @@
     }
 
     .container {
-      max-width: 900px;
+      max-width: 960px;
       width: 100%;
       padding: 20px;
     }
@@ -26,6 +26,22 @@
       text-align: center;
       color: #0d47a1;
       margin-bottom: 20px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .filters input,
+    .filters select {
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
     }
 
     .link-card {
@@ -108,6 +124,19 @@
       right: 12px;
     }
 
+    .copied-msg {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4caf50;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      display: none;
+    }
+
     @keyframes blink {
       0%, 100% { opacity: 1; }
       50% { opacity: 0; }
@@ -130,59 +159,136 @@
       .copy-btn {
         width: 100%;
       }
+
+      .filters {
+        flex-direction: column;
+        align-items: center;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>🔗 Latest Government Links</h2>
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Search by keyword..." />
+      <select id="monthFilter">
+        <option value="">All Months</option>
+      </select>
+      <select id="yearFilter">
+        <option value="">All Years</option>
+      </select>
+    </div>
     <div id="links"></div>
   </div>
 
   <script>
     const sheetURL = 'https://docs.google.com/spreadsheets/d/108keumRnsLI02VoSuE0b_0YsdsxBnhXJ4Vev5GnPAiE/gviz/tq?tqx=out:json';
 
+    let allData = [];
+
     fetch(sheetURL)
       .then(res => res.text())
       .then(text => {
         const json = JSON.parse(text.substr(47).slice(0, -2));
         const rows = json.table.rows;
-        const container = document.getElementById('links');
         const reversedRows = rows.slice().reverse();
+        allData = reversedRows.map((row, i) => ({
+          index: reversedRows.length - i,
+          url: row.c[0]?.v || '',
+          date: row.c[1]?.v || '',
+          month: row.c[2]?.v || '',
+          year: row.c[3]?.v || '',
+          name: row.c[4]?.v || ''
+        })).filter(r => r.url);
 
-        reversedRows.forEach((row, i) => {
-          const url = row.c[0]?.v || '';
-          const date = row.c[1]?.v || '';
-          const month = row.c[2]?.v || '';
-          const year = row.c[3]?.v || '';
-          const name = row.c[4]?.v || '';
-          if (!url) return;
-
-          const card = document.createElement('div');
-          card.className = 'link-card';
-          card.innerHTML = `
-            <div class="top-row">
-              <div class="serial">${reversedRows.length - i}.</div>
-              <div class="info">
-                <a href="${url}" target="_blank">${url}</a>
-              </div>
-            </div>
-            <div class="bottom-row">
-              <button class="copy-btn">Copy</button>
-              <div class="date-text">${date} ${month} ${year}${name ? ' - ' + name : ''}</div>
-            </div>
-            ${i === 0 ? '<div class="red-dot" title="New Link"></div>' : ''}
-          `;
-
-          card.querySelector('.copy-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(url);
-            const dot = card.querySelector('.red-dot');
-            if (dot) dot.remove();
-          });
-
-          container.appendChild(card);
-        });
+        populateFilters();
+        renderLinks(allData);
       });
+
+    function populateFilters() {
+      const monthSet = new Set();
+      const yearSet = new Set();
+
+      allData.forEach(d => {
+        if (d.month) monthSet.add(d.month);
+        if (d.year) yearSet.add(d.year);
+      });
+
+      const monthFilter = document.getElementById('monthFilter');
+      const yearFilter = document.getElementById('yearFilter');
+
+      [...monthSet].sort().forEach(month => {
+        const opt = document.createElement('option');
+        opt.value = month;
+        opt.textContent = month;
+        monthFilter.appendChild(opt);
+      });
+
+      [...yearSet].sort().forEach(year => {
+        const opt = document.createElement('option');
+        opt.value = year;
+        opt.textContent = year;
+        yearFilter.appendChild(opt);
+      });
+
+      document.getElementById('searchInput').addEventListener('input', applyFilters);
+      monthFilter.addEventListener('change', applyFilters);
+      yearFilter.addEventListener('change', applyFilters);
+    }
+
+    function applyFilters() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const selectedMonth = document.getElementById('monthFilter').value;
+      const selectedYear = document.getElementById('yearFilter').value;
+
+      const filtered = allData.filter(item => {
+        const matchKeyword = item.url.toLowerCase().includes(keyword) || item.name.toLowerCase().includes(keyword);
+        const matchMonth = !selectedMonth || item.month === selectedMonth;
+        const matchYear = !selectedYear || item.year === selectedYear;
+        return matchKeyword && matchMonth && matchYear;
+      });
+
+      renderLinks(filtered);
+    }
+
+    function renderLinks(data) {
+      const container = document.getElementById('links');
+      container.innerHTML = '';
+
+      data.forEach((item, i) => {
+        const card = document.createElement('div');
+        card.className = 'link-card';
+        card.innerHTML = `
+          <div class="copied-msg">Copied!</div>
+          <div class="top-row">
+            <div class="serial">${item.index}.</div>
+            <div class="info">
+              <a href="${item.url}" target="_blank">${item.url}</a>
+            </div>
+          </div>
+          <div class="bottom-row">
+            <button class="copy-btn">Copy</button>
+            <div class="date-text">${item.date} ${item.month} ${item.year}${item.name ? ' - ' + item.name : ''}</div>
+          </div>
+          ${i === 0 ? '<div class="red-dot" title="New Link"></div>' : ''}
+        `;
+
+        const btn = card.querySelector('.copy-btn');
+        const msg = card.querySelector('.copied-msg');
+
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(item.url);
+          msg.style.display = 'block';
+          setTimeout(() => msg.style.display = 'none', 1500);
+
+          const dot = card.querySelector('.red-dot');
+          if (dot) dot.remove();
+        });
+
+        container.appendChild(card);
+      });
+    }
   </script>
 </body>
 </html>
