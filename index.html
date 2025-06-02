@@ -65,6 +65,7 @@
       font-size: 16px;
       min-width: 40px; /* Ensure consistent width for serial */
       text-align: center;
+      flex-shrink: 0; /* Prevent serial from shrinking */
     }
 
     .url {
@@ -72,18 +73,16 @@
       font-size: 16px;
       color: #333; /* Darker text for URL */
       text-decoration: none;
-      word-break: break-all;
       flex: 1; /* Allows URL to take up remaining space */
-      display: -webkit-box;
-      -webkit-line-clamp: 2; /* Limit URL to 2 lines */
-      -webkit-box-orient: vertical;
-      overflow: hidden;
+      white-space: nowrap; /* Keep text on a single line */
+      overflow: hidden; /* Hide overflow content */
+      text-overflow: ellipsis; /* Add ellipsis for hidden text */
     }
 
     .bottom-section {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end; /* Align date to bottom and button to center */
+      align-items: center; /* Align date and button centrally */
     }
 
     .date {
@@ -103,6 +102,7 @@
       font-weight: 500;
       transition: background 0.3s ease, box-shadow 0.3s ease;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Button shadow */
+      flex-shrink: 0; /* Prevent button from shrinking */
     }
 
     .copy-btn.copied {
@@ -131,31 +131,42 @@
       50% { opacity: 0; }
     }
 
+    /* Media queries for mobile devices */
     @media screen and (max-width: 600px) {
+      .link-card {
+        padding: 12px 15px; /* Reduce padding for smaller screens */
+        min-height: auto; /* Allow height to adjust */
+      }
       .top-section {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row; /* Keep serial and URL in one row */
+        align-items: center;
         margin-bottom: 8px;
       }
       .serial-wrapper {
-        margin-bottom: 8px;
-        margin-right: 0;
-      }
-      .url {
+        margin-right: 10px; /* Adjust margin */
+        min-width: 35px; /* Smaller min-width for serial */
         font-size: 15px;
       }
+      .url {
+        font-size: 14px; /* Smaller font for URL */
+      }
       .bottom-section {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row; /* Keep date and button in one row */
+        align-items: center;
       }
       .copy-btn {
-        margin-top: 10px;
-        width: 100%; /* Full width button on small screens */
-        text-align: center;
-        padding: 12px;
+        padding: 8px 15px; /* Smaller button padding */
+        font-size: 14px;
+        margin-left: 10px; /* Add some space from date */
       }
       .date {
-        margin-top: 5px;
+        font-size: 12px;
+      }
+      .red-dot {
+        top: 10px;
+        right: 10px;
+        width: 8px;
+        height: 8px;
       }
     }
   </style>
