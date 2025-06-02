@@ -3,155 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Modern URL List</title>
+  <title>Latest Government Links</title>
   <style>
-    * {
+    body {
+      font-family: 'Segoe UI', sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      background: linear-gradient(to right, #e3f2fd, #ffffff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
 
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background-color: #f2f4f7;
+    .container {
+      max-width: 900px;
+      width: 100%;
       padding: 20px;
     }
 
-    .url-card {
-      background: #fff;
+    h2 {
+      text-align: center;
+      color: #0d47a1;
+      margin-bottom: 20px;
+    }
+
+    .link-card {
+      background: #ffffff;
       border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
       padding: 16px 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-      transition: transform 0.2s ease;
+      margin: 16px 0;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display: block;
     }
 
-    .url-card:hover {
-      transform: scale(1.01);
+    .link-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
 
-    .url-row {
+    .top-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-weight: 600;
-      font-size: 16px;
-      color: #2b2b2b;
-      flex-wrap: wrap;
-      word-break: break-word;
+      gap: 15px;
+      margin-bottom: 8px;
     }
 
     .serial {
-      color: #0056b3;
       font-weight: bold;
+      color: #1565c0;
+      font-size: 18px;
     }
 
-    .url {
-      color: #0056b3;
+    .info {
+      flex-grow: 1;
+    }
+
+    .info a {
+      font-weight: 600;
+      font-size: 16px;
+      color: #0d47a1;
       text-decoration: none;
-      flex: 1;
+      word-break: break-word;
     }
 
-    .url:hover {
-      text-decoration: underline;
-    }
-
-    .action-row {
+    .bottom-row {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
-
-    .date {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .buttons {
-      display: flex;
-      gap: 10px;
+      justify-content: space-between;
       margin-top: 6px;
     }
 
-    .copy-btn, .share-btn {
-      padding: 6px 14px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
+    .date-text {
+      color: #555;
       font-size: 14px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
     }
 
     .copy-btn {
-      background-color: #007bff;
+      background: #1976d2;
       color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
+      flex-shrink: 0;
     }
 
     .copy-btn:hover {
-      background-color: #0069d9;
+      background: #1565c0;
     }
 
-    .share-btn {
-      background-color: #dc3545;
-      color: white;
+    .red-dot {
+      width: 12px;
+      height: 12px;
+      background: red;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+      position: absolute;
+      top: 12px;
+      right: 12px;
     }
 
-    .share-btn:hover {
-      background-color: #c82333;
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
-    @media (max-width: 600px) {
-      .action-row {
+    @media screen and (max-width: 600px) {
+      .top-row {
         flex-direction: column;
         align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 6px;
       }
 
-      .buttons {
-        margin-top: 10px;
+      .bottom-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .copy-btn {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
-
-  <!-- Sample URL Card -->
-  <div class="url-card">
-    <div class="url-row">
-      <span class="serial">65.</span>
-      <a href="https://bpssc.bihar.gov.in/" class="url" target="_blank">https://bpssc.bihar.gov.in/</a>
-    </div>
-    <div class="action-row">
-      <span class="date">30 May 2025</span>
-      <div class="buttons">
-        <button class="copy-btn" onclick="copyText('https://bpssc.bihar.gov.in/')">Copy</button>
-        <button class="share-btn" onclick="shareLink('https://bpssc.bihar.gov.in/')">Share</button>
-      </div>
-    </div>
+  <div class="container">
+    <h2>🔗 Latest Government Links</h2>
+    <div id="links"></div>
   </div>
 
-  <!-- Repeat above .url-card block dynamically as needed -->
-
   <script>
-    function copyText(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Copied to clipboard:\n" + text);
-      });
-    }
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/108keumRnsLI02VoSuE0b_0YsdsxBnhXJ4Vev5GnPAiE/gviz/tq?tqx=out:json';
 
-    function shareLink(url) {
-      if (navigator.share) {
-        navigator.share({
-          title: 'Check this link',
-          url: url
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(text => {
+        const json = JSON.parse(text.substr(47).slice(0, -2));
+        const rows = json.table.rows;
+        const container = document.getElementById('links');
+        const reversedRows = rows.slice().reverse();
+
+        reversedRows.forEach((row, i) => {
+          const url = row.c[0]?.v || '';
+          const date = row.c[1]?.v || '';
+          const month = row.c[2]?.v || '';
+          const year = row.c[3]?.v || '';
+          const name = row.c[4]?.v || '';
+          if (!url) return;
+
+          const card = document.createElement('div');
+          card.className = 'link-card';
+          card.innerHTML = `
+            <div class="top-row">
+              <div class="serial">${reversedRows.length - i}.</div>
+              <div class="info">
+                <a href="${url}" target="_blank">${url}</a>
+              </div>
+            </div>
+            <div class="bottom-row">
+              <button class="copy-btn">Copy</button>
+              <div class="date-text">${date} ${month} ${year}${name ? ' - ' + name : ''}</div>
+            </div>
+            ${i === 0 ? '<div class="red-dot" title="New Link"></div>' : ''}
+          `;
+
+          card.querySelector('.copy-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(url);
+            const dot = card.querySelector('.red-dot');
+            if (dot) dot.remove();
+          });
+
+          container.appendChild(card);
         });
-      } else {
-        prompt("Copy this URL:", url);
-      }
-    }
+      });
   </script>
-
 </body>
 </html>
