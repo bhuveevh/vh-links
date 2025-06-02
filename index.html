@@ -1,145 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Important Links - vH.online</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Latest Government Links</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f5f7fa;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      background: linear-gradient(to right, #e3f2fd, #ffffff);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
     }
+
     .container {
       max-width: 900px;
-      margin: auto;
-      background: #fff;
+      width: 100%;
       padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
+
     h2 {
       text-align: center;
-      color: #007bff;
-      margin-bottom: 25px;
+      color: #0d47a1;
+      margin-bottom: 20px;
     }
+
     .link-card {
-      position: relative;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: #e3f2fd;
-      margin-bottom: 15px;
-      padding: 15px 20px;
-      border-radius: 10px;
-      transition: 0.3s;
+      justify-content: space-between;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      padding: 16px 20px;
+      margin: 16px 0;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+
     .link-card:hover {
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      transform: translateY(-4px);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.15);
     }
-    .link-info {
-      flex: 1;
-    }
-    .link-info a {
-      font-size: 16px;
+
+    .serial {
       font-weight: bold;
+      color: #1565c0;
+      font-size: 18px;
+      margin-right: 15px;
+    }
+
+    .info {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+
+    .info a {
+      font-weight: 600;
+      font-size: 16px;
       color: #0d47a1;
       text-decoration: none;
+      word-break: break-all;
     }
-    .link-info small {
+
+    .info small {
       display: block;
-      margin-top: 5px;
       color: #555;
+      margin-top: 4px;
     }
+
     .copy-btn {
-      background: #0d47a1;
+      background: #1976d2;
       color: white;
       border: none;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s;
     }
-    .copy-btn:active {
-      transform: scale(0.97);
+
+    .copy-btn:hover {
+      background: #1565c0;
     }
-    .dot {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      height: 12px;
+
+    .red-dot {
       width: 12px;
-      background-color: red;
+      height: 12px;
+      background: red;
       border-radius: 50%;
       animation: blink 1s infinite;
+      position: absolute;
+      top: 12px;
+      right: 12px;
     }
+
     @keyframes blink {
-      50% {
-        opacity: 0.3;
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    @media screen and (max-width: 600px) {
+      .link-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .copy-btn {
+        margin-top: 10px;
+        width: 100%;
+      }
+
+      .serial {
+        margin-bottom: 6px;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Important Links For vH.online</h2>
-    <div id="links-container"></div>
+    <h2>🔗 Latest Government Links</h2>
+    <div id="links"></div>
   </div>
 
   <script>
-    const sheetURL = 'https://opensheet.elk.sh/108keumRnsLI02VoSuE0b_0YsdsxBnhXJ4Vev5GnPAiE/Sheet1';
-    const container = document.getElementById('links-container');
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/108keumRnsLI02VoSuE0b_0YsdsxBnhXJ4Vev5GnPAiE/gviz/tq?tqx=out:json';
 
-    async function loadData() {
-      const res = await fetch(sheetURL);
-      const data = await res.json();
+    fetch(sheetURL)
+      .then(res => res.text())
+      .then(text => {
+        const json = JSON.parse(text.substr(47).slice(0, -2));
+        const rows = json.table.rows;
+        const container = document.getElementById('links');
+        const reversedRows = rows.slice().reverse();
 
-      // Sort by latest (top)
-      data.sort((a, b) => new Date(`${b.Years}-${b.Month}-${b.Date}`) - new Date(`${a.Years}-${a.Month}-${a.Date}`));
+        reversedRows.forEach((row, i) => {
+          const url = row.c[0]?.v || '';
+          const date = row.c[1]?.v || '';
+          const month = row.c[2]?.v || '';
+          const year = row.c[3]?.v || '';
+          const name = row.c[4]?.v || '';
+          if (!url) return;
 
-      data.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'link-card';
-        
-        const linkInfo = document.createElement('div');
-        linkInfo.className = 'link-info';
-        linkInfo.innerHTML = `
-          <a href="${item['Important Links For My vH.online website']}" target="_blank">${item['Important Links For My vH.online website']}</a>
-          <small>${item.Date} ${item.Month} ${item.Years}</small>
-        `;
+          const card = document.createElement('div');
+          card.className = 'link-card';
+          card.innerHTML = `
+            <div class="serial">${reversedRows.length - i}.</div>
+            <div class="info">
+              <a href="${url}" target="_blank">${url}</a>
+              <small>${date} ${month} ${year}${name ? ' - ' + name : ''}</small>
+            </div>
+            <button class="copy-btn">Copy</button>
+            ${i === 0 ? '<div class="red-dot" title="New Link"></div>' : ''}
+          `;
 
-        const button = document.createElement('button');
-        button.className = 'copy-btn';
-        button.innerText = 'Copy';
-        
-        // Red dot only for latest (index 0)
-        if (index === 0) {
-          const dot = document.createElement('div');
-          dot.className = 'dot';
-          div.appendChild(dot);
-        }
+          card.querySelector('.copy-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(url);
+            const dot = card.querySelector('.red-dot');
+            if (dot) dot.remove();
+          });
 
-        // Copy event
-        button.addEventListener('click', () => {
-          navigator.clipboard.writeText(item['Important Links For My vH.online website']);
-          button.innerText = 'Copied!';
-          button.style.background = 'green';
-
-          const dot = div.querySelector('.dot');
-          if (dot) dot.remove();
-
-          setTimeout(() => {
-            button.innerText = 'Copy';
-            button.style.background = '#0d47a1';
-          }, 2000);
+          container.appendChild(card);
         });
-
-        div.appendChild(linkInfo);
-        div.appendChild(button);
-        container.appendChild(div);
       });
-    }
-
-    loadData();
   </script>
 </body>
 </html>
