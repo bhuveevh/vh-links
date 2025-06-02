@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Important Links - vH.online</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #007bff;
+      margin-bottom: 25px;
+    }
+    .link-card {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #e3f2fd;
+      margin-bottom: 15px;
+      padding: 15px 20px;
+      border-radius: 10px;
+      transition: 0.3s;
+    }
+    .link-card:hover {
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .link-info {
+      flex: 1;
+    }
+    .link-info a {
+      font-size: 16px;
+      font-weight: bold;
+      color: #0d47a1;
+      text-decoration: none;
+    }
+    .link-info small {
+      display: block;
+      margin-top: 5px;
+      color: #555;
+    }
+    .copy-btn {
+      background: #0d47a1;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .copy-btn:active {
+      transform: scale(0.97);
+    }
+    .dot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      height: 12px;
+      width: 12px;
+      background-color: red;
+      border-radius: 50%;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      50% {
+        opacity: 0.3;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Important Links For vH.online</h2>
+    <div id="links-container"></div>
+  </div>
+
+  <script>
+    const sheetURL = 'https://opensheet.elk.sh/108keumRnsLI02VoSuE0b_0YsdsxBnhXJ4Vev5GnPAiE/Sheet1';
+    const container = document.getElementById('links-container');
+
+    async function loadData() {
+      const res = await fetch(sheetURL);
+      const data = await res.json();
+
+      // Sort by latest (top)
+      data.sort((a, b) => new Date(`${b.Years}-${b.Month}-${b.Date}`) - new Date(`${a.Years}-${a.Month}-${a.Date}`));
+
+      data.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'link-card';
+        
+        const linkInfo = document.createElement('div');
+        linkInfo.className = 'link-info';
+        linkInfo.innerHTML = `
+          <a href="${item['Important Links For My vH.online website']}" target="_blank">${item['Important Links For My vH.online website']}</a>
+          <small>${item.Date} ${item.Month} ${item.Years}</small>
+        `;
+
+        const button = document.createElement('button');
+        button.className = 'copy-btn';
+        button.innerText = 'Copy';
+        
+        // Red dot only for latest (index 0)
+        if (index === 0) {
+          const dot = document.createElement('div');
+          dot.className = 'dot';
+          div.appendChild(dot);
+        }
+
+        // Copy event
+        button.addEventListener('click', () => {
+          navigator.clipboard.writeText(item['Important Links For My vH.online website']);
+          button.innerText = 'Copied!';
+          button.style.background = 'green';
+
+          const dot = div.querySelector('.dot');
+          if (dot) dot.remove();
+
+          setTimeout(() => {
+            button.innerText = 'Copy';
+            button.style.background = '#0d47a1';
+          }, 2000);
+        });
+
+        div.appendChild(linkInfo);
+        div.appendChild(button);
+        container.appendChild(div);
+      });
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
